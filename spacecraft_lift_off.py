@@ -1,6 +1,7 @@
 import time
 import krpc
 from loguru import logger
+from helper import stage_if_low_on_fuel
 
 conn = krpc.connect(name="Sub-orbital flight")
 vessel = conn.space_center.active_vessel
@@ -23,27 +24,17 @@ vessel.auto_pilot.target_pitch_and_heading(90, 90)
 vessel.auto_pilot.engage()
 vessel.control.throttle = 1
 
+# Create connection streams, about 20 times faster than just calling them directly
+vessel_mean_altitude = conn.add_stream(getattr, vessel.flight(), "mean_altitude")
+vessel_apoapsis_altitude = conn.add_stream(getattr, vessel.orbit, "apoapsis_altitude")
+vessel_pitch = conn.add_stream(getattr, vessel.flight(), "pitch")
+vessel_heading = conn.add_stream(getattr, vessel.flight(), "heading")
 
-def stage_if_low_on_fuel():
-    stage = vessel.control.current_stage
-    resources = vessel.resources_in_decouple_stage(stage - 1)
-    solid_fuel_amount: float = resources.amount("SolidFuel")
-    liquid_fuel_amount: float = resources.amount("LiquidFuel")
 
-    if solid_fuel_amount < 0.1 and liquid_fuel_amount < 0.1:
-        logger.info(f"Staging! Current stage is {stage}")
-        vessel.control.activate_next_stage()
-
-vessel_mean_altitude = conn.add_stream(getattr, vessel.flight(), 'mean_altitude')
-vessel_apoapsis_altitude = conn.add_stream(getattr, vessel.orbit, 'apoapsis_altitude')
-vessel_pitch = conn.add_stream(getattr, vessel.flight(), 'pitch')
-vessel_heading = conn.add_stream(getattr, vessel.flight(), 'heading')
-
-# logger.info(f"Resources on the ship: {vessel.resources.names}")
 while 1:
     time.sleep(0.01)
 
-    stage_if_low_on_fuel()
+    airplane_stage_if_low_on_fuel()
 
     # Start Gravity turn
     mean_altitude = vessel_mean_altitude()
@@ -68,7 +59,7 @@ while 1:
         #     f"Vessel not facing the right way, lowering throttle:\nPitch: {current_pitch} / {target_pitch}, Heading: {current_heading} / {target_heading}"
         # )
     else:
-        vessel.control.throttle += 0.02
+        vessel.control.throttle += 0.03
 
     # If apoapsis reached, end program
     apoapsis_altitude = vessel.orbit.apoapsis_altitude

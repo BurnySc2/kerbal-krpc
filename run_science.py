@@ -12,21 +12,24 @@ min_scientific_value: float = 0.01
 
 vessel = conn.space_center.active_vessel
 
-obt_frame = vessel.orbit.body.non_rotating_reference_frame
-srf_frame = vessel.orbit.body.reference_frame
+# obt_frame = vessel.orbit.body.non_rotating_reference_frame
+# srf_frame = vessel.orbit.body.reference_frame
+#
+# obt_speed = vessel.flight(obt_frame).speed
+# srf_speed = vessel.flight(srf_frame).speed
 
-obt_speed = vessel.flight(obt_frame).speed
-srf_speed = vessel.flight(srf_frame).speed
+# Create connection streams, about 20 times faster than just calling them directly
+vessel_experiments = conn.add_stream(getattr, vessel.parts, "experiments")
 
 while vessel.situation.name in {"pre_launch"}:
     time.sleep(0.1)
+
 
 logger.info(f"Gathering science...")
 while 1:
     time.sleep(2)
     names_run: Set[str] = set()
-    parts = vessel.parts
-    experiments = parts.experiments
+    experiments = vessel_experiments()
     for i, experiment in enumerate(experiments):
         name: str = experiment.part.name
         if experiment.inoperable or not experiment.available:

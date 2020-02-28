@@ -77,15 +77,20 @@ def stage_if_low_on_fuel():
         vessel.control.activate_next_stage()
 
 
+node_remaining_delta_v = conn.add_stream(getattr, n, "remaining_delta_v")
+
 if spacecraft_facing_direction:
     logger.info(f"Starting maneuver burn.")
+    n_remaining_delta_v = node_remaining_delta_v()
     vessel.control.throttle = 1
-    while n.remaining_delta_v > burn_till_remaining_delta_v:
+
+    while n_remaining_delta_v > burn_till_remaining_delta_v:
         stage_if_low_on_fuel()
         time.sleep(0.01)
     vessel.control.throttle = 0.1
     logger.info(f"Maneuver almost done. Fine tuning.")
-    while n.remaining_delta_v > burn_till_remaining_delta_v_fine_tune:
+
+    while n_remaining_delta_v > burn_till_remaining_delta_v_fine_tune:
         stage_if_low_on_fuel()
         time.sleep(0.01)
     vessel.control.throttle = 0
