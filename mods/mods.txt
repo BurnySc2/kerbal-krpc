@@ -1,0 +1,20 @@
+
+show more stats and stuff, delta v
+https://github.com/jrbudda/KerbalEngineer
+
+better making maneuver nodes etc
+https://github.com/DMagic1/KSP_Better_Maneuvering
+
+alarm clock
+https://github.com/TriggerAu/KerbalAlarmClock
+
+waypoint manager
+https://github.com/jrossignol/WaypointManager
+
+ksp achievements
+https://github.com/malkuth1974/Achievements
+
+krpc
+https://krpc.github.io/krpc/getting-started.html
+https://github.com/krpc/krpc
+
