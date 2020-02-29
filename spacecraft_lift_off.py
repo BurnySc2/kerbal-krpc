@@ -8,8 +8,10 @@ vessel = conn.space_center.active_vessel
 
 # CONFIG
 target_apoapasis_altitude = 100_000
-gravity_turn_start_altitude = 10_000
+gravity_turn_start_altitude = 5_000
 gravity_turn_end_altitude = 60_000
+min_altitude_before_program_stops = 40_000
+
 
 # Degree tolerance
 pitch_tolerance = 5
@@ -25,19 +27,20 @@ vessel.auto_pilot.engage()
 vessel.control.throttle = 1
 
 # Create connection streams, about 20 times faster than just calling them directly
-vessel_mean_altitude = conn.add_stream(getattr, vessel.flight(), "mean_altitude")
+vessel_surface_altitude = conn.add_stream(getattr, vessel.flight(), "surface_altitude")
 vessel_apoapsis_altitude = conn.add_stream(getattr, vessel.orbit, "apoapsis_altitude")
 vessel_pitch = conn.add_stream(getattr, vessel.flight(), "pitch")
 vessel_heading = conn.add_stream(getattr, vessel.flight(), "heading")
 
+time.sleep(1)
 
 while 1:
     time.sleep(0.01)
 
-    airplane_stage_if_low_on_fuel()
+    stage_if_low_on_fuel()
 
     # Start Gravity turn
-    mean_altitude = vessel_mean_altitude()
+    mean_altitude = vessel_surface_altitude()
     if mean_altitude > gravity_turn_start_altitude:
         frac = (mean_altitude - gravity_turn_start_altitude) / (gravity_turn_end_altitude - gravity_turn_start_altitude)
         target_pitch = 90 - min(90, frac * 90)
@@ -62,9 +65,15 @@ while 1:
         vessel.control.throttle += 0.03
 
     # If apoapsis reached, end program
-    apoapsis_altitude = vessel.orbit.apoapsis_altitude
-    if apoapsis_altitude > vessel_apoapsis_altitude():
-        logger.info(f"Apoapsis of {apoapsis_altitude} reached. Ending program.")
+    if target_apoapasis_altitude < vessel_apoapsis_altitude():
         vessel.control.throttle = 0
-        vessel.auto_pilot.disengage()
-        break
+        if min_altitude_before_program_stops < vessel_surface_altitude():
+            logger.info(
+                f"Apoapsis of {vessel_apoapsis_altitude():.01f} and min altitude of {vessel_surface_altitude():.01f} reached. Ending program."
+            )
+            break
+
+vessel.auto_pilot.disengage()
+vessel.control.sas = True
+print(vessel.control.sas_mode)
+# vessel.control.sas_mode = "stability_assist"

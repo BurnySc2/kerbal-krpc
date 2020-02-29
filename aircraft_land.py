@@ -61,8 +61,8 @@ vessel.auto_pilot.engage()
 vessel.auto_pilot.roll_threshold = 5
 # vessel.auto_pilot.roll_threshold = 20
 # vessel.auto_pilot.deceleration_time = (30, 30, 10)
-# vessel.auto_pilot.deceleration_time = (5, 5, 5)
-vessel.auto_pilot.deceleration_time = (10, 5, 5)
+vessel.auto_pilot.deceleration_time = (5, 5, 5)
+# vessel.auto_pilot.deceleration_time = (10, 5, 5)
 vessel.auto_pilot.attenuation_angle = (1, 1, 0.1)
 
 vessel.auto_pilot.target_roll = 0
@@ -137,7 +137,9 @@ while 1:
         target_pitch = math.sin(angle) * max_pitch_angle
 
         target_pitch = clip(-max_pitch_angle, target_pitch, max_pitch_angle)
-        logger.info(f"Target pitch: {target_pitch:.01f}, target height: {target_altitude:.01f}, {angle:.01f} {frac:.01f} {distance_to_stop:.01f}")
+        logger.info(
+            f"Target pitch: {target_pitch:.01f}, target height: {target_altitude:.01f}, {angle:.01f} {frac:.01f} {distance_to_stop:.01f}"
+        )
         vessel.auto_pilot.target_pitch = target_pitch
 
         # Calculate heading (bearing) to target coordinate

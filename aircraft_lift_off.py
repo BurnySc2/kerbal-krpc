@@ -14,7 +14,7 @@ target_height = 5_000
 min_height = 1_000
 max_pitch_angle = 30
 # in m/s
-lift_off_velocity = 75
+lift_off_velocity = 50
 # in meters
 snapshot_distance_interval = 1000
 total_snapshots = 10
@@ -39,8 +39,8 @@ vessel.auto_pilot.engage()
 vessel.control.throttle = 1
 
 vessel.auto_pilot.roll_threshold = 5
-vessel.auto_pilot.deceleration_time = (30, 30, 10)
-vessel.auto_pilot.deceleration_time = (5, 5, 5)
+vessel.auto_pilot.deceleration_time = (30, 30, 30)
+# vessel.auto_pilot.deceleration_time = (5, 5, 5)
 
 vessel.auto_pilot.target_roll = 0
 vessel.auto_pilot.target_heading = 90
@@ -83,4 +83,8 @@ while 1:
         target_pitch = clip(-1, frac, 1) * max_pitch_angle
 
         vessel.auto_pilot.target_pitch = target_pitch
-        # logger.info(f"Reached enough horizontal velocity, take off! Target pitch: {target_pitch}")
+        logger.info(f"Reached enough horizontal velocity, take off! Target pitch: {target_pitch}")
+
+    # logger.info(f"{vessel.situation.name}")
+    # if vessel.situation.name in {"landed", "splashed"}:
+    #     break

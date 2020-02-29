@@ -8,15 +8,10 @@ conn = krpc.connect(name="Run science experiments to gather science")
 min_science: float = 5
 # How much percentage value the experiment has, e.g. if the experiment was already run 3 times, its probably gonna be under 0.1
 min_scientific_value: float = 0.01
-
+# TODO only automatically run experiments that can be rerun
+# TODO automatically transmit if we have enough electric charge to transmit data ?
 
 vessel = conn.space_center.active_vessel
-
-# obt_frame = vessel.orbit.body.non_rotating_reference_frame
-# srf_frame = vessel.orbit.body.reference_frame
-#
-# obt_speed = vessel.flight(obt_frame).speed
-# srf_speed = vessel.flight(srf_frame).speed
 
 # Create connection streams, about 20 times faster than just calling them directly
 vessel_experiments = conn.add_stream(getattr, vessel.parts, "experiments")
