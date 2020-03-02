@@ -11,12 +11,12 @@ vessel = conn.space_center.active_vessel
 
 # CONFIG
 # Max height before approaching the landing strip
-max_height = 500
+max_height = 2_000
 max_pitch_angle = 30
 # in m/s
 land_horizontal_velocity = 50
 # Velocity before approaching landing strip
-max_horizontal_velocity = 150
+max_horizontal_velocity = 200
 # in m/s^2
 max_horizontal_acceleration = 5
 full_speed_until_distance_from_stop = 8_000
@@ -27,12 +27,12 @@ approach_positions = [
     (-0.04890819975806609, -74.61715594392183),
     (-0.04903254063985847, -74.52202945586112),
     (-0.04888744349362171, -74.4262874262937),
-    (-0.048610370996377016, -74.33118874491561),
+    # (-0.048610370996377016, -74.33118874491561),
     (-0.04823103686423749, -74.23520377127176),
-    (-0.0477959568040884, -74.13928068856688),
+    # (-0.0477959568040884, -74.13928068856688),
     (-0.0473724048307247, -74.04486868365854),
-    (-0.04696806021551466, -73.94921178031439),
-    (-0.0465586749007686, -73.85183988928668),
+    # (-0.04696806021551466, -73.94921178031439),
+    # (-0.0465586749007686, -73.85183988928668),
     (-0.046139842471566, -73.75689623484516),
 ]
 approach_index = len(approach_positions) - 1
@@ -60,10 +60,13 @@ vessel.auto_pilot.engage()
 
 vessel.auto_pilot.roll_threshold = 5
 # vessel.auto_pilot.roll_threshold = 20
+
 # vessel.auto_pilot.deceleration_time = (30, 30, 10)
 vessel.auto_pilot.deceleration_time = (5, 5, 5)
 # vessel.auto_pilot.deceleration_time = (10, 5, 5)
-vessel.auto_pilot.attenuation_angle = (1, 1, 0.1)
+
+# Try to aim as best as possible
+vessel.auto_pilot.attenuation_angle = (0.1, 0.1, 0.1)
 
 vessel.auto_pilot.target_roll = 0
 # # vessel.auto_pilot.target_heading = 90
@@ -81,6 +84,7 @@ touch_down = False
 while 1:
     time.sleep(time_interval)
 
+    brakes = False
     # airplane_stage()
 
     target_position: tuple = approach_positions[approach_index] if approach_index >= 0 else stop_position
@@ -114,13 +118,16 @@ while 1:
             pass
     # Lower throttle if horizontal velocity is above landing velocity
     else:
-        # Max deceleration not yet reached
+        # Max decceleration not yet reached
         if horizontal_acceleration > -1:
             if vessel.control.throttle > 0:
                 logger.info(f"Lowering throttle")
             vessel.control.throttle -= 0.1
         else:
             pass
+
+        if horizontal_velocity_fraction > 1.1:
+            brakes = True
 
     target_altitude = (distance_to_stop - 1800) / 10
     target_altitude = clip(0.01, target_altitude, max_height)
@@ -150,18 +157,24 @@ while 1:
         vessel.auto_pilot.target_pitch = replace_me_pitch
         vessel.auto_pilot.target_heading = 270
         vessel.control.throttle = 0
-        vessel.control.brakes = True
+        brakes = True
+
+
+    vessel.control.brakes = brakes
 
     # If close to waypoint, pick next waypoint
-    if distance_to_target < 500 and target_position != stop_position:
+    if distance_to_target < min(2000, 5*max_horizontal_velocity) and target_position != stop_position:
         approach_index -= 1
         logger.info(f"Reached a waypoint! Approach index at: {approach_index}")
 
     # If horizontal speed small 1 and low altitude, means we landed probably
     if vessel_horizontal_speed() < 1 and vessel_surface_altitude() < 100:
         time.sleep(1)
-        vessel.control.throttle = 0
-        vessel.auto_pilot.disengage()
-        # vessel.control.brakes = False
         logger.info(f"Aircraft landed (I hope)!")
         break
+
+# vessel.control.brakes = False
+vessel.control.throttle = 0
+vessel.auto_pilot.disengage()
+# Reset autopilot values
+vessel.auto_pilot.attenuation_angle = (1, 1, 1)

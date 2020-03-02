@@ -37,10 +37,12 @@ vessel_heading = conn.add_stream(getattr, vessel.flight(), "heading")
 
 vessel.auto_pilot.engage()
 vessel.control.throttle = 1
+vessel.control.brakes = False
 
-vessel.auto_pilot.roll_threshold = 5
+vessel.auto_pilot.roll_threshold = 180
 vessel.auto_pilot.deceleration_time = (30, 30, 30)
 # vessel.auto_pilot.deceleration_time = (5, 5, 5)
+vessel.auto_pilot.attenuation_angle = (0.1, 0.1, 0.1)
 
 vessel.auto_pilot.target_roll = 0
 vessel.auto_pilot.target_heading = 90
