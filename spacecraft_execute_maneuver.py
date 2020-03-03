@@ -10,10 +10,11 @@ vessel = conn.space_center.active_vessel
 nodes = vessel.control.nodes
 
 # CONFIG
-burn_till_remaining_delta_v = 10
-burn_till_remaining_delta_v_fine_tune = 0.1
+burn_till_remaining_delta_v = 20
 # 20 seconds buffer when warping to node
-warp_to_buffer_seconds = 25
+warp_to_buffer_seconds = 15
+# Degree tolerance at burn
+tolerance_tuple = (0.05, 0.05, 0.05)
 
 if not nodes:
     logger.info(f"No maneuver node found. Exiting program")
@@ -22,12 +23,10 @@ n = nodes[0]
 
 # Stage if no ISP available
 # if isp not available: stage until we get something with fuel
-while not vessel.specific_impulse:
+while not vessel.specific_impulse or not vessel.available_thrust:
     stage_if_low_on_fuel()
     time.sleep(0.5)
 
-# Degree tolerance at burn
-tolerance_tuple = (0.02, 0.02, 0.02)
 
 vessel.auto_pilot.reference_frame = n.reference_frame
 vessel.auto_pilot.target_direction = (0, 1, 0)
@@ -81,20 +80,21 @@ if spacecraft_facing_direction:
         tolerance_timer -= step_time
 
         if remaining_delta_v > last_node_remaining_delta_v and tolerance_timer < 0:
-            logger.warning(f"Something went wrong: remaining burn delta v went up!")
+            logger.warning(f"Something went wrong: remaining burn delta v went up! Ending program. Remaining delta v: {remaining_delta_v}")
+            n.remove()
             break
 
         elif remaining_delta_v > burn_till_remaining_delta_v:
             vessel.control.throttle = 1
 
-        elif remaining_delta_v > burn_till_remaining_delta_v_fine_tune:
-            vessel.control.throttle = 0.1
+        elif remaining_delta_v > 0.0001:
+            vessel.control.throttle = remaining_delta_v / burn_till_remaining_delta_v
             if not fine_tuning:
                 logger.info(f"Maneuver almost done. Fine tuning.")
                 fine_tuning = True
 
-        elif remaining_delta_v < burn_till_remaining_delta_v_fine_tune:
-            logger.info(f"Maneuver completed. Ending program.")
+        elif remaining_delta_v < 0.0001:
+            logger.info(f"Maneuver completed. Ending program. Remaining delta v: {remaining_delta_v}")
             n.remove()
             break
 

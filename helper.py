@@ -10,7 +10,7 @@ vessel = conn.space_center.active_vessel
 vessel_current_stage = conn.add_stream(getattr, vessel.control, "current_stage")
 
 
-def stage_if_low_on_fuel():
+def stage_if_low_on_fuel(do_stage=True) -> float:
     stage = vessel_current_stage()
     resources = vessel.resources_in_decouple_stage(stage - 1)
     solid_fuel_amount: float = resources.amount("SolidFuel")
@@ -23,10 +23,13 @@ def stage_if_low_on_fuel():
     # logger.info(f"Current stage vs next sage: Solid fuel {solid_fuel_amount:.01f} / {next_stage_solid_fuel_amount:.01f}, liquid fuel {liquid_fuel_amount:.01f} / {next_stage_liquid_fuel_amount:.01f}")
 
     if solid_fuel_amount < 0.1 and liquid_fuel_amount < 0.1:
-        logger.info(
-            f"Staging because solid fuel is at {solid_fuel_amount} and liquid fuel at {liquid_fuel_amount}! Current stage is {stage}"
-        )
-        vessel.control.activate_next_stage()
+        if do_stage:
+            logger.info(
+                f"Staging because solid fuel is at {solid_fuel_amount} and liquid fuel at {liquid_fuel_amount}! Current stage is {stage}"
+            )
+            vessel.control.activate_next_stage()
+        return 0
+    return max(solid_fuel_amount, liquid_fuel_amount)
 
 
 vessel_thrust = conn.add_stream(getattr, vessel, "thrust")

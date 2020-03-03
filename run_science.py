@@ -18,7 +18,7 @@ class Science:
         # How much percentage value the experiment has, e.g. if the experiment was already run 3 times, its probably gonna be under 0.1
         self.min_scientific_value: float = 0.01
         # Only automatically run experiments that can be rerun
-        self.run_non_rerunnable_science = True
+        self.run_non_rerunnable_science = False
         # TODO Automatically transmit if we have enough electric charge to transmit data ?
         self.transmit_science = False
         self.min_transmit_science: float = 0.1
@@ -85,7 +85,7 @@ class Science:
                 transmit_science = data.data_amount * data.transmit_value
                 if transmit_science > self.min_transmit_science:
                     logger.info(
-                        f"Transmitting science on part {experiment.part.name} for transmit science total or {transmit_science:.02f}"
+                        f"Transmitting science on part {experiment.part.name} for transmit science total of {transmit_science:.02f}"
                     )
                     experiment.transmit()
 
