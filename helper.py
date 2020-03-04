@@ -16,10 +16,6 @@ def stage_if_low_on_fuel(do_stage=True) -> float:
     solid_fuel_amount: float = resources.amount("SolidFuel")
     liquid_fuel_amount: float = resources.amount("LiquidFuel")
 
-    # resources_next = vessel.resources_in_decouple_stage(stage - 2, cumulative=True)
-    # next_stage_solid_fuel_amount: float = resources_next.amount("SolidFuel")
-    # next_stage_liquid_fuel_amount: float = resources_next.amount("LiquidFuel")
-
     # logger.info(f"Current stage vs next sage: Solid fuel {solid_fuel_amount:.01f} / {next_stage_solid_fuel_amount:.01f}, liquid fuel {liquid_fuel_amount:.01f} / {next_stage_liquid_fuel_amount:.01f}")
 
     if solid_fuel_amount < 0.1 and liquid_fuel_amount < 0.1:

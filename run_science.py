@@ -20,7 +20,7 @@ class Science:
         # Only automatically run experiments that can be rerun
         self.run_non_rerunnable_science = False
         # TODO Automatically transmit if we have enough electric charge to transmit data ?
-        self.transmit_science = False
+        self.transmit_science = True
         self.min_transmit_science: float = 0.1
 
         # TODO If there is a scientist within the crew, it can reset non-rerunnable experiments
@@ -83,11 +83,17 @@ class Science:
             elif experiment.has_data and experiment.data and self.transmit_science:
                 data = experiment.data[0]
                 transmit_science = data.data_amount * data.transmit_value
-                if transmit_science > self.min_transmit_science:
+                if transmit_science > self.min_transmit_science and vessel.resources.amount(
+                    "ElectricCharge"
+                ) * 0.99 > vessel.resources.max("ElectricCharge"):
                     logger.info(
                         f"Transmitting science on part {experiment.part.name} for transmit science total of {transmit_science:.02f}"
                     )
+                    # TODO only transmit if electric charge is >99%, or check if we have enough electric charge to transmit
                     experiment.transmit()
+                    # Wait some time before running more experiments
+                    # self.last_run = time.time() + 20
+                    return
 
 
 if __name__ == "__main__":

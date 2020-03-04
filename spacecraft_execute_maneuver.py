@@ -12,7 +12,7 @@ nodes = vessel.control.nodes
 # CONFIG
 burn_till_remaining_delta_v = 20
 # 20 seconds buffer when warping to node
-warp_to_buffer_seconds = 15
+warp_to_buffer_seconds = 20
 # Degree tolerance at burn
 tolerance_tuple = (0.05, 0.05, 0.05)
 

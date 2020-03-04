@@ -2,8 +2,17 @@
 show more stats and stuff, delta v
 https://github.com/jrbudda/KerbalEngineer
 
-better making maneuver nodes etc
-https://github.com/DMagic1/KSP_Better_Maneuvering
+# better making maneuver nodes etc
+# https://github.com/DMagic1/KSP_Better_Maneuvering
+
+better making maneuver nodes
+https://github.com/radistmorse/KSPPreciseManeuver
+
+[x]science
+https://forum.kerbalspaceprogram.com/index.php?/topic/182683-ksp-190-x-science-continued-ksp-science-report-and-checklist-v523/
+
+stage recovery
+https://github.com/magico13/StageRecovery
 
 alarm clock
 https://github.com/TriggerAu/KerbalAlarmClock
@@ -18,3 +27,11 @@ krpc
 https://krpc.github.io/krpc/getting-started.html
 https://github.com/krpc/krpc
 
+
+
+
+
+perhaps later:
+https://www.curseforge.com/kerbal/ksp-mods/kerbal-attachment-system-kas
+https://www.curseforge.com/kerbal/ksp-mods/kerbal-inventory-system-kis
+https://forum.kerbalspaceprogram.com/index.php?/topic/155700-173-realism-overhaul-v1274-23-november-2019/

@@ -8,13 +8,14 @@ vessel = conn.space_center.active_vessel
 
 # CONFIG
 target_apoapasis_altitude = 72_000
-gravity_turn_start_altitude = 5_000
-gravity_turn_end_altitude = 60_000
+gravity_turn_start_altitude = 3_000
+gravity_turn_end_altitude = 50_000
 min_altitude_before_program_stops = 35_000
+# Throttle to full until the current stage is out of fuel
 boost_until_out_of_fuel = True
 
 # Degree tolerance
-pitch_tolerance = 5
+pitch_tolerance = 20
 heading_tolerance = 10
 # END OF CONFIG
 
@@ -22,11 +23,15 @@ heading_tolerance = 10
 #     logger.info(f"Vessel not in 'pre_launch' phase!")
 #     time.sleep(3)
 
-vessel.auto_pilot.engage()
+# obt_frame = vessel.orbit.body.non_rotating_reference_frame
+# srf_frame = vessel.orbit.body.reference_frame
+
+# vessel.auto_pilot.reference_frame = vessel.orbit.body.non_rotating_reference_frame
 vessel.auto_pilot.target_pitch = 90
 vessel.auto_pilot.target_heading = 90
 vessel.auto_pilot.roll_threshold = 5
 vessel.auto_pilot.target_roll = 0
+vessel.auto_pilot.engage()
 
 # Create connection streams, about 20 times faster than just calling them directly
 vessel_surface_altitude = conn.add_stream(getattr, vessel.flight(), "surface_altitude")
@@ -83,7 +88,7 @@ while 1:
         #     f"Vessel not facing the right way, lowering throttle:\nPitch: {current_pitch} / {target_pitch}, Heading: {current_heading} / {target_heading}"
         # )
     else:
-        vessel.control.throttle += 0.03
+        vessel.control.throttle += 0.05
 
     vessel.auto_pilot.target_pitch = target_pitch
 
